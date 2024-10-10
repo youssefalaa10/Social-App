@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social/shared/styles/icon_broken.dart';
-import '../../modules/social_app/chats/chats_screen.dart';
 
-import '../../modules/social_app/feeds/feeds_screen.dart';
-import '../../modules/social_app/new_post/new_post_screen.dart';
-import '../../modules/social_app/settings/settings_screen.dart';
-import '../../modules/social_app/users/users_screen.dart';
 import 'package:get_it/get_it.dart';
-import '../../modules/social_app/chats/cubit/messages_cubit.dart';
-import '../../modules/social_app/new_post/cubit/posts_cubit.dart';
-import '../../modules/social_app/edit_profile/cubit/profile_cubit.dart';
+
+import '../chats/chats_screen.dart';
+import '../chats/cubit/messages_cubit.dart';
+import '../feeds/feeds_screen.dart';
+import '../new_post/cubit/posts_cubit.dart';
+import '../new_post/new_post_screen.dart';
+import '../settings/cubit/profile_cubit.dart';
+import '../settings/settings_screen.dart';
+import '../users/users_screen.dart';
+
 
 final getIt = GetIt.instance;
 

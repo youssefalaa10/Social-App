@@ -1,8 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../shared/network/local/cache_helper.dart'; // Import CacheHelper
-import 'states.dart';
+import 'package:social/modules/Auth/login/cubit/login_states.dart';
+import '../../../../shared/network/local/cache_helper.dart';
+
 
 class SocialLoginCubit extends Cubit<SocialLoginStates> {
   SocialLoginCubit() : super(SocialLoginInitial());

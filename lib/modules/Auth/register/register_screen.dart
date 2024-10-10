@@ -1,19 +1,21 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social/layout/social_app/social_layout.dart';
-import 'package:social/modules/social_app/social_register/cubit/cubit.dart';
-import 'package:social/modules/social_app/social_register/cubit/states.dart';
+
 import 'package:social/shared/components/components.dart';
 
-class SocialRegisterScreen extends StatelessWidget {
+import '../../layout/layout_screen.dart';
+import 'cubit/register_cubit.dart';
+import 'cubit/register_states.dart';
+
+class RegisterScreen extends StatelessWidget {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
-  SocialRegisterScreen({super.key});
+  RegisterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,9 @@ class SocialRegisterScreen extends StatelessWidget {
           if (state is RegisterSuccessState) {
             navigateAndFinish(
               context,
-               LayoutScreen(userId: state.uId!,),
+              LayoutScreen(
+                userId: state.uId!,
+              ),
             );
           } else if (state is RegisterErrorState) {
             showToast(text: state.error, state: ToastStates.error);
@@ -44,15 +48,19 @@ class SocialRegisterScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Register',
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
+                              ?.copyWith(
                                 color: Colors.black,
                               ),
                         ),
                         Text(
                           'Register now to communicate with friends',
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: Colors.grey,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Colors.grey,
+                                  ),
                         ),
                         const SizedBox(height: 30.0),
                         defaultFormField(
@@ -88,7 +96,8 @@ class SocialRegisterScreen extends StatelessWidget {
                           onSubmit: (value) {},
                           isPassword: RegisterCubit.get(context).isPassword,
                           suffixPressed: () {
-                            RegisterCubit.get(context).changePasswordVisibility();
+                            RegisterCubit.get(context)
+                                .changePasswordVisibility();
                           },
                           validate: (String? value) {
                             if (value == null || value.isEmpty) {

@@ -2,9 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../../models/social_app/social_user_model.dart';
-import '../../../../shared/network/local/cache_helper.dart'; // Import CacheHelper
-import 'states.dart';
+
+import '../../../../models/user_model.dart';
+import '../../../../shared/network/local/cache_helper.dart';
+import 'register_states.dart'; // Import CacheHelper
+
 
 class RegisterCubit extends Cubit<RegisterState> {
   RegisterCubit() : super(RegisterInitial());

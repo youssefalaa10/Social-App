@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../models/social_app/comment_model.dart';
-import '../../../models/social_app/social_user_model.dart';
+
+import '../../../models/comment_model.dart';
+import '../../../models/user_model.dart';
 import 'comments_state.dart';
 
 class CommentCubit extends Cubit<CommentState> {

@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social/models/social_app/message_model.dart';
-import 'package:social/models/social_app/social_user_model.dart';
+
+import '../../../models/message_model.dart';
+import '../../../models/user_model.dart';
 import 'messages_state.dart';
 
 class MessageCubit extends Cubit<MessageState> {

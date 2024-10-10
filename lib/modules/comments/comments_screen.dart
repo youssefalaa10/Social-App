@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 
-import '../../models/social_app/comment_model.dart';
+
+import '../../models/comment_model.dart';
 import 'cubit/comments_cubit.dart';
 import 'cubit/comments_state.dart';
 

@@ -3,8 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../models/social_app/post_model.dart';
-import '../../../../models/social_app/social_user_model.dart'; // Include the user model
+
+import '../../../models/post_model.dart';
+import '../../../models/user_model.dart';
 import 'posts_state.dart';
 
 class PostCubit extends Cubit<PostState> {

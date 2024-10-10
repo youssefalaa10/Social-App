@@ -4,12 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:social/shared/styles/icon_broken.dart';
-import 'package:social/models/social_app/social_user_model.dart';
-import 'package:social/modules/social_app/edit_profile/edit_profile_screen.dart';
-import '../edit_profile/cubit/profile_cubit.dart';
-import '../edit_profile/cubit/profile_state.dart';
-import '../social_login/social_login_screen.dart';
+
+import '../../models/user_model.dart';
+import '../Auth/login/login_screen.dart';
+import 'cubit/profile_cubit.dart';
+import 'cubit/profile_state.dart';
+import 'edit_profile_screen.dart';
+
 final getIt = GetIt.instance;
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -143,16 +146,15 @@ class SettingsScreen extends StatelessWidget {
         OutlinedButton(
           onPressed: () {
             // Navigate to Edit Profile Screen
-   Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => BlocProvider.value(
-      value: getIt<ProfileCubit>(), // Use the cubit from GetIt
-      child: EditProfileScreen(),
-    ),
-  ),
-);
-
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider.value(
+                  value: getIt<ProfileCubit>(), // Use the cubit from GetIt
+                  child: EditProfileScreen(),
+                ),
+              ),
+            );
           },
           child: const Icon(IconBroken.edit, size: 16.0),
         ),
@@ -167,7 +169,7 @@ class SettingsScreen extends StatelessWidget {
         await FirebaseAuth.instance.signOut();
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => SocialLoginScreen()),
+          MaterialPageRoute(builder: (context) => LoginScreen()),
         );
       },
       child: const Text(

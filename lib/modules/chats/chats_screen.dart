@@ -2,9 +2,11 @@ import 'package:conditional_builder_null_safety/conditional_builder_null_safety.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:social/models/social_app/social_user_model.dart';
+
 import 'package:social/shared/components/components.dart';
-import '../chat_details/chat_details_screen.dart';
+
+import '../../models/user_model.dart';
+import 'chat_details_screen.dart';
 import 'cubit/messages_cubit.dart';
 import 'cubit/messages_state.dart';
 

@@ -2,10 +2,11 @@ import 'package:conditional_builder_null_safety/conditional_builder_null_safety.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../models/social_app/message_model.dart';
-import '../../../models/social_app/social_user_model.dart';
+
 import '../../../shared/styles/colors.dart';
 import '../../../shared/styles/icon_broken.dart';
+import '../../models/message_model.dart';
+import '../../models/user_model.dart';
 import '../chats/cubit/messages_cubit.dart';
 import '../chats/cubit/messages_state.dart';
 

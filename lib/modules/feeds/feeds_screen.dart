@@ -4,7 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:social/shared/styles/icon_broken.dart';
-import '../../../models/social_app/post_model.dart';
+
+import '../../models/post_model.dart';
 import '../new_post/cubit/posts_cubit.dart';
 import '../new_post/cubit/posts_state.dart';
 

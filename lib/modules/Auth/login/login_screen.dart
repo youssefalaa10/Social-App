@@ -1,19 +1,21 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social/layout/social_app/social_layout.dart';
-import 'package:social/modules/social_app/social_login/cubit/cubit.dart';
-import 'package:social/modules/social_app/social_login/cubit/states.dart';
-import 'package:social/modules/social_app/social_register/social_register_screen.dart';
+
 import 'package:social/shared/components/components.dart';
 import 'package:social/shared/network/local/cache_helper.dart';
 
-class SocialLoginScreen extends StatelessWidget {
+import '../../layout/layout_screen.dart';
+import '../register/register_screen.dart';
+import 'cubit/login_cubit.dart';
+import 'cubit/login_states.dart';
+
+class LoginScreen extends StatelessWidget {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  SocialLoginScreen({super.key});
+  LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +31,9 @@ class SocialLoginScreen extends StatelessWidget {
             ).then((value) {
               navigateAndFinish(
                 context,
-                 LayoutScreen(userId: state.uId!,),
+                LayoutScreen(
+                  userId: state.uId!,
+                ),
               );
             });
           }
@@ -130,7 +134,7 @@ class SocialLoginScreen extends StatelessWidget {
                           const Text('Don\'t have an account?'),
                           TextButton(
                             onPressed: () {
-                              navigateTo(context, SocialRegisterScreen());
+                              navigateTo(context, RegisterScreen());
                             },
                             child: const Text(
                               'Register',
