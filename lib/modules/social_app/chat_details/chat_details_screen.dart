@@ -1,10 +1,11 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social/models/social_app/message_model.dart';
-import 'package:social/models/social_app/social_user_model.dart';
-import 'package:social/shared/styles/colors.dart';
-import 'package:social/shared/styles/icon_broken.dart';
+
+import '../../../models/social_app/message_model.dart';
+import '../../../models/social_app/social_user_model.dart';
+import '../../../shared/styles/colors.dart';
+import '../../../shared/styles/icon_broken.dart';
 import '../chats/cubit/messages_cubit.dart';
 import '../chats/cubit/messages_state.dart';
 
@@ -19,7 +20,7 @@ class ChatDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Builder(
       builder: (context) {
-        // Fetch messages when the screen is built
+        // Ensure that the messages are loaded when the screen is displayed
         MessageCubit.get(context).getMessages(receiverId: userModel!.uId);
         return BlocConsumer<MessageCubit, MessageState>(
           listener: (context, state) {},
@@ -32,8 +33,7 @@ class ChatDetailsScreen extends StatelessWidget {
               body: ConditionalBuilder(
                 condition: MessageCubit.get(context).messages.isNotEmpty,
                 builder: (context) => buildChatContent(context),
-                fallback: (context) =>
-                    const Center(child: CircularProgressIndicator()),
+                fallback: (context) => const Center(child: CircularProgressIndicator()),
               ),
             );
           },

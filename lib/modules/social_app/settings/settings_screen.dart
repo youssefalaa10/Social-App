@@ -1,24 +1,26 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social/shared/components/components.dart';
+import 'package:get_it/get_it.dart';
+
 import 'package:social/shared/styles/icon_broken.dart';
 import 'package:social/models/social_app/social_user_model.dart';
 import 'package:social/modules/social_app/edit_profile/edit_profile_screen.dart';
 import '../edit_profile/cubit/profile_cubit.dart';
 import '../edit_profile/cubit/profile_state.dart';
 import '../social_login/social_login_screen.dart';
-
+final getIt = GetIt.instance;
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var cubit = ProfileCubit.get(context);
+    var cubit = getIt<ProfileCubit>();
 
     // Ensure to load user data here if not loaded already
     if (cubit.userModel == null) {
-      cubit.getUserData(FirebaseAuth.instance.currentUser!.uid); // Use current user's ID
+      cubit.getUserData(
+          FirebaseAuth.instance.currentUser!.uid); // Use current user's ID
     }
 
     return BlocConsumer<ProfileCubit, ProfileState>(
@@ -122,7 +124,8 @@ class SettingsScreen extends StatelessWidget {
         Expanded(
           child: OutlinedButton(
             onPressed: () {
-              cubit.getProfileImage(); // Trigger the method to pick profile image
+              cubit
+                  .getProfileImage(); // Trigger the method to pick profile image
             },
             child: const Text('Change Profile Image'),
           ),
@@ -140,7 +143,16 @@ class SettingsScreen extends StatelessWidget {
         OutlinedButton(
           onPressed: () {
             // Navigate to Edit Profile Screen
-            navigateTo(context, EditProfileScreen());
+   Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => BlocProvider.value(
+      value: getIt<ProfileCubit>(), // Use the cubit from GetIt
+      child: EditProfileScreen(),
+    ),
+  ),
+);
+
           },
           child: const Icon(IconBroken.edit, size: 16.0),
         ),

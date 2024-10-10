@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 
 import '../../models/social_app/comment_model.dart';
 import 'cubit/comments_cubit.dart';
 import 'cubit/comments_state.dart';
 
+final getIt = GetIt.instance;
 class CommentScreen extends StatelessWidget {
   final String postId;
   final TextEditingController commentController = TextEditingController();
@@ -26,7 +28,7 @@ class CommentScreen extends StatelessWidget {
           }
         },
         builder: (context, state) {
-          var cubit = CommentCubit.get(context);
+          var cubit = getIt<CommentCubit>(); 
           var comments = cubit.comments; // Assuming comments are fetched and stored in cubit
 
           return Scaffold(

@@ -5,13 +5,18 @@ import 'package:social/shared/bloc_observer.dart';
 import 'package:social/shared/network/local/cache_helper.dart';
 import 'package:social/shared/styles/themes.dart';
 
+
 import 'layout/social_app/social_layout.dart';
 import 'modules/social_app/social_login/social_login_screen.dart';
+import 'shared/DI/service_locator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await CacheHelper.init();
+  
+  // Initialize GetIt
+  setupGetIt();  // Call the setup function to register dependencies
 
   Bloc.observer = MyBlocObserver();
 

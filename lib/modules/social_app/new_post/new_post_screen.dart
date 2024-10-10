@@ -29,25 +29,19 @@ class NewPostScreen extends StatelessWidget {
       builder: (context, state) {
         var cubit = PostCubit.get(context);
 
-        // If userModel is null, fetch user data and show a loading indicator
-        if (cubit.userModel == null) {
-          cubit.getUserData(userId); // Fetch user data if not already fetched
-          return const Center(child: CircularProgressIndicator());
-        }
-
         return Scaffold(
           appBar: AppBar(
             title: const Text('Create Post'),
             actions: [
               defaultTextButton(
                 function: () {
-                  final now = DateTime.now();
                   if (textController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Post content cannot be empty')),
                     );
                     return;
                   }
+                  final now = DateTime.now();
                   if (cubit.postImage == null) {
                     cubit.createPost(
                       dateTime: now.toString(),
@@ -77,9 +71,11 @@ class NewPostScreen extends StatelessWidget {
                 if (state is PostLoadingState) const LinearProgressIndicator(),
                 Row(
                   children: [
-                    CircleAvatar(
+                  CircleAvatar(
                       radius: 25.0,
-                      backgroundImage: NetworkImage(cubit.userModel!.image),
+                      backgroundImage: NetworkImage(
+                        'https://img.freepik.com/free-photo/pretty-smiling-joyfully-female-with-fair-hair-dressed-casually-looking-with-satisfaction_176420-15187.jpg?w=996&t=st=1665531661~exp=1665532261~hmac=11fd387eee878ce97f048ca33c4d86f1a5c0c29f5092933c0632cf80a8d85d12',
+                      ),
                     ),
                     const SizedBox(width: 15.0),
                     Expanded(

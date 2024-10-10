@@ -228,6 +228,7 @@ void navigateTo(context, widget) => Navigator.push(
         builder: (context) => widget,
       ),
     );
+    
 
 void navigateAndFinish(
   context,

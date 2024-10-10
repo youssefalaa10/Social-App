@@ -1,11 +1,14 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 import 'package:social/shared/styles/icon_broken.dart';
 import '../../../models/social_app/post_model.dart';
 import '../new_post/cubit/posts_cubit.dart';
 import '../new_post/cubit/posts_state.dart';
+
+final getIt = GetIt.instance;
 
 class FeedsScreen extends StatefulWidget {
   const FeedsScreen({super.key});
@@ -18,7 +21,7 @@ class _FeedsScreenState extends State<FeedsScreen> {
   @override
   void initState() {
     super.initState();
-    PostCubit.get(context).getPosts(); // Fetch posts when the screen is initialized
+    getIt<PostCubit>().getPosts();
   }
 
   @override
@@ -26,7 +29,7 @@ class _FeedsScreenState extends State<FeedsScreen> {
     return BlocConsumer<PostCubit, PostState>(
       listener: (context, state) {},
       builder: (context, state) {
-        var cubit = PostCubit.get(context);
+        var cubit = getIt<PostCubit>();
 
         return ConditionalBuilder(
           condition: cubit.posts.isNotEmpty,
@@ -40,14 +43,16 @@ class _FeedsScreenState extends State<FeedsScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) =>
                       buildPostItem(cubit.posts[index], context, index),
-                  separatorBuilder: (context, index) => const SizedBox(height: 8.0),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 8.0),
                   itemCount: cubit.posts.length,
                 ),
                 const SizedBox(height: 8.0),
               ],
             ),
           ),
-          fallback: (context) => const Center(child: CircularProgressIndicator()),
+          fallback: (context) =>
+              const Center(child: CircularProgressIndicator()),
         );
       },
     );
@@ -95,7 +100,8 @@ class _FeedsScreenState extends State<FeedsScreen> {
           children: [
             _buildPostHeader(model, context, index),
             const SizedBox(height: 10.0),
-            Text(model.text ?? '', style: Theme.of(context).textTheme.titleMedium),
+            Text(model.text ?? '',
+                style: Theme.of(context).textTheme.titleMedium),
             if (model.postImage != null && model.postImage!.isNotEmpty)
               Padding(
                 padding: const EdgeInsetsDirectional.only(top: 15.0),
@@ -132,7 +138,8 @@ class _FeedsScreenState extends State<FeedsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(model.name, style: const TextStyle(height: 1.4)),
-              Text(model.dataTime ?? '', style: Theme.of(context).textTheme.bodySmall),
+              Text(model.dataTime ?? '',
+                  style: Theme.of(context).textTheme.bodySmall),
             ],
           ),
         ),
@@ -182,7 +189,10 @@ class _FeedsScreenState extends State<FeedsScreen> {
                 children: [
                   const Icon(IconBroken.chat, size: 16.0, color: Colors.amber),
                   const SizedBox(width: 5.0),
-                  Text('0 comments', style: Theme.of(context).textTheme.bodySmall), // Placeholder for dynamic comments
+                  Text('0 comments',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall), // Placeholder for dynamic comments
                 ],
               ),
               onTap: () {},

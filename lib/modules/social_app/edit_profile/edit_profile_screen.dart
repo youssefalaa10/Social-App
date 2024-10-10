@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:social/shared/components/components.dart';
 import 'package:social/shared/styles/icon_broken.dart';
 import 'cubit/profile_cubit.dart';
@@ -12,6 +13,7 @@ class EditProfileScreen extends StatelessWidget {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController bioController = TextEditingController();
 
+final getIt = GetIt.instance;
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ProfileCubit, ProfileState>(
@@ -24,7 +26,7 @@ class EditProfileScreen extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        var cubit = ProfileCubit.get(context);
+        var cubit = getIt<ProfileCubit>(); 
         var userModel = cubit.userModel;
 
         nameController.text = userModel?.name ?? '';
