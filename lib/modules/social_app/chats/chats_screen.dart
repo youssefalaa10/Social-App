@@ -1,30 +1,45 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social/modules/social_app/chat_details/chat_details_screen.dart';
+import 'package:social/models/social_app/social_user_model.dart';
 import 'package:social/shared/components/components.dart';
-import '../../../layout/social_app/cubit/cubit.dart';
-import '../../../layout/social_app/cubit/states.dart';
-import '../../../models/social_app/social_user_model.dart';
+import '../chat_details/chat_details_screen.dart';
+import 'cubit/messages_cubit.dart';
+import 'cubit/messages_state.dart';
 
 class ChatsScreen extends StatelessWidget {
   const ChatsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<SocialCubit, SocialStates>(
-      listener: (context, state) {},
+    return BlocConsumer<MessageCubit, MessageState>(
+      listener: (context, state) {
+        if (state is MessageErrorState) {
+          // Handle errors if necessary
+          print("Error loading users: ${state.error}");
+        }
+      },
       builder: (context, state) {
-        return ConditionalBuilder(
-          condition: SocialCubit.get(context).users.isNotEmpty,
-          builder: (context) => ListView.separated(
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (context, index) => buildChatItem(SocialCubit.get(context).users[index],context),
-            separatorBuilder: (context, index) => myDivider(),
-            itemCount: SocialCubit.get(context).users.length,
+        var cubit = MessageCubit.get(context);
+
+        // Ensure to load users if not already loaded
+        if (cubit.users.isEmpty) {
+          cubit.getUsers(); // Fetch users when the screen is built
+        }
+
+        return Scaffold(
+          appBar: AppBar(title: const Text('Chats')),
+          body: ConditionalBuilder(
+            condition: cubit.users.isNotEmpty || state is! MessageLoadingState,
+            builder: (context) => ListView.separated(
+              physics: const BouncingScrollPhysics(),
+              itemBuilder: (context, index) =>
+                  buildChatItem(cubit.users[index], context),
+              separatorBuilder: (context, index) => myDivider(),
+              itemCount: cubit.users.length,
+            ),
+            fallback: (context) => const Center(child: CircularProgressIndicator()),
           ),
-          fallback: (context) =>
-              const Center(child: CircularProgressIndicator()),
         );
       },
     );
@@ -32,6 +47,7 @@ class ChatsScreen extends StatelessWidget {
 
   Widget buildChatItem(SocialUserModel model, context) => InkWell(
         onTap: () {
+          // Navigate to chat details when a user is clicked
           navigateTo(
               context,
               ChatDetailsScreen(

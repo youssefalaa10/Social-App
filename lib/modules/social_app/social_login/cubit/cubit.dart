@@ -1,39 +1,48 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social/modules/social_app/social_login/cubit/states.dart';
+import '../../../../shared/network/local/cache_helper.dart'; // Import CacheHelper
+import 'states.dart';
 
 class SocialLoginCubit extends Cubit<SocialLoginStates> {
-  SocialLoginCubit() : super(SocialLoginInitialState());
+  SocialLoginCubit() : super(SocialLoginInitial());
 
   static SocialLoginCubit get(context) => BlocProvider.of(context);
 
-  void userLogin({
-    required String email,
-    required String password,
-  }) {
-    emit(SocialLoginLoadingState());
-
-    FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-
-    ).then((value) {
-      debugPrint(value.user!.email);
-      debugPrint(value.user!.uid);
-      emit(SocialLoginSuccessState(value.user!.uid));
-    }).catchError((error){
-      emit(SocialLoginErrorState(error.toString()));
-    });
-  }
-
-  IconData suffix = Icons.visibility_outlined;
   bool isPassword = true;
+  IconData suffix = Icons.visibility_outlined;
 
   void changePasswordVisibility() {
     isPassword = !isPassword;
-    suffix =
-        isPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined;
+    suffix = isPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined;
     emit(SocialChangePasswordVisibilityState());
+  }
+
+  // Clear any existing token before login
+  void clearTokenBeforeLogin() async {
+    await CacheHelper.removeData(key: 'uId');
+  }
+
+  // User login method with Firebase Authentication
+  void userLogin({
+    required String email,
+    required String password,
+  }) async {
+    clearTokenBeforeLogin(); // Clear any existing token before login
+    emit(SocialLoginLoadingState());
+
+    try {
+      UserCredential user = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Save the new token (user UID) in CacheHelper
+      CacheHelper.saveData(key: 'uId', value: user.user?.uid);
+
+      emit(SocialLoginSuccessState(user.user?.uid));
+    } catch (error) {
+      emit(SocialLoginErrorState(error.toString()));
+    }
   }
 }

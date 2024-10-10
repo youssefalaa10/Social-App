@@ -1,49 +1,50 @@
-class SocialUserModel
-{
-late String name;
-late String email;
-late String phone;
-late String uId;
-late String image;
-late String cover;
-late String bio;
-late bool isEmailVerified;
+class SocialUserModel {
+  String name;
+  String email;
+  String phone;
+  String uId;
+  String image;
+  String cover;
+  String bio;
+  bool isEmailVerified;
 
+  // Constructor with required and optional fields
   SocialUserModel({
-   required this.email,
-   required this.name,
-   required this.phone,
-   required this.uId,
-   required this.image,
-   required this.cover,
-   required this.bio,
-   required this.isEmailVerified,
+    required this.name,
+    required this.email,
+    required this.phone,
+    required this.uId,
+    this.image = '',
+    this.cover = '',
+    this.bio = '',
+    this.isEmailVerified = false,
+  });
 
-});
-
-  SocialUserModel.fromJson(Map<String,dynamic>json)
-  {
-    email = json['email'];
-    name = json['name'];
-    phone = json['phone'];
-    uId = json['uId'];
-    image = json['image'];
-    cover = json['cover'];
-    bio = json['bio'];
-    isEmailVerified = json['isEmailVerified'];
+  // Named constructor to create an object from JSON, with validation
+  factory SocialUserModel.fromJson(Map<String, dynamic> json) {
+    return SocialUserModel(
+      name: json['name'],
+      email: json['email'],
+      phone: json['phone'],
+      uId: json['uId'],
+      image: json['image'] ?? '',
+      cover: json['cover'] ?? '',
+      bio: json['bio'] ?? '',
+      isEmailVerified: json['isEmailVerified'] ?? false,
+    );
   }
 
-  Map<String,dynamic> toMap()
-  {
+  // Method to convert object to a Map (to be used when saving data)
+  Map<String, dynamic> toMap() {
     return {
-      'name':name,
-      'email':email,
-      'phone':phone,
-      'uId':uId,
-      'image':image,
-      'cover':cover,
-      'bio':bio,
-      'isEmailVerified':isEmailVerified,
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'uId': uId,
+      'image': image,
+      'cover': cover,
+      'bio': bio,
+      'isEmailVerified': isEmailVerified,
     };
   }
 }

@@ -1,24 +1,17 @@
+abstract class RegisterState {}
 
-abstract class SocialRegisterStates {}
+class RegisterInitial extends RegisterState {}
 
-class SocialRegisterInitialState extends SocialRegisterStates{}
+class RegisterLoadingState extends RegisterState {}
 
-class SocialRegisterLoadingState extends SocialRegisterStates{}
-
-class SocialRegisterSuccessState extends SocialRegisterStates{}
-
-class SocialRegisterErrorState extends SocialRegisterStates
-{
-  final String error;
-  SocialRegisterErrorState(this.error);
+class RegisterSuccessState extends RegisterState {
+  final String? uId;
+  RegisterSuccessState(this.uId);
 }
 
-class SocialCreateUserSuccessState extends SocialRegisterStates{}
-
-class SocialCreateUserErrorState extends SocialRegisterStates
-{
+class RegisterErrorState extends RegisterState {
   final String error;
-  SocialCreateUserErrorState(this.error);
+  RegisterErrorState(this.error);
 }
 
-class SocialRegisterChangePasswordVisibilityState extends SocialRegisterStates{}
+class ChangePasswordVisibilityState extends RegisterState {}  // Added state for password visibility toggle

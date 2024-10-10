@@ -1,7 +1,7 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:social/shared/cubit/cubit.dart';
+// import 'package:social/shared/cubit/cubit.dart';
 import 'package:social/shared/styles/icon_broken.dart';
 
 Widget defaultButton({
@@ -135,38 +135,38 @@ Widget buildTaskItem(Map model, context) => Dismissible(
             const SizedBox(
               width: 15.0,
             ),
-            IconButton(
-              onPressed: () {
-                AppCubit.get(context).updateData(
-                  status: 'done',
-                  id: model['id'],
-                );
-              },
-              icon: const Icon(
-                Icons.check_box,
-                color: Colors.green,
-              ),
-            ),
-            IconButton(
-              onPressed: () {
-                AppCubit.get(context).updateData(
-                  status: 'archive',
-                  id: model['id'],
-                );
-              },
-              icon: const Icon(
-                Icons.archive,
-                color: Colors.black54,
-              ),
-            ),
+            // IconButton(
+            //   onPressed: () {
+            //     AppCubit.get(context).updateData(
+            //       status: 'done',
+            //       id: model['id'],
+            //     );
+            //   },
+            //   icon: const Icon(
+            //     Icons.check_box,
+            //     color: Colors.green,
+            //   ),
+            // ),
+            // IconButton(
+            //   onPressed: () {
+            //     AppCubit.get(context).updateData(
+            //       status: 'archive',
+            //       id: model['id'],
+            //     );
+            //   },
+            //   icon: const Icon(
+            //     Icons.archive,
+            //     color: Colors.black54,
+            //   ),
+            // ),
           ],
         ),
       ),
-      onDismissed: (direction) {
-        AppCubit.get(context).deleteData(
-          id: model['id'],
-        );
-      },
+      // onDismissed: (direction) {
+      //   AppCubit.get(context).deleteData(
+      //     id: model['id'],
+      //   );
+      // },
     );
 
 Widget tasksBuilder({

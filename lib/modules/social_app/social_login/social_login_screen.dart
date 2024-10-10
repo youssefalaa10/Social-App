@@ -21,25 +21,25 @@ class SocialLoginScreen extends StatelessWidget {
       create: (BuildContext context) => SocialLoginCubit(),
       child: BlocConsumer<SocialLoginCubit, SocialLoginStates>(
         listener: (context, state) {
+          // Handle success
+          if (state is SocialLoginSuccessState) {
+            CacheHelper.saveData(
+              key: 'uId',
+              value: state.uId,
+            ).then((value) {
+              navigateAndFinish(
+                context,
+                 LayoutScreen(userId: state.uId!,),
+              );
+            });
+          }
+          // Handle error
           if (state is SocialLoginErrorState) {
             showToast(
               text: state.error,
               state: ToastStates.error,
             );
           }
-          if(state is SocialLoginSuccessState)
-            {
-              CacheHelper.saveData(
-                key: 'uId',
-                value: state.uId,
-              ).then((value)
-              {
-                navigateAndFinish(
-                  context,
-                  const SocialLayout(),
-                );
-              });
-            }
         },
         builder: (context, state) {
           return Scaffold(
@@ -54,21 +54,20 @@ class SocialLoginScreen extends StatelessWidget {
                     children: [
                       Text(
                         'LOGIN',
-                        style:
-                            Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                  color: Colors.black,
-                                ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineMedium
+                            ?.copyWith(
+                              color: Colors.black,
+                            ),
                       ),
                       Text(
-                        'login now to communicate with friends',
-                        style:
-                            Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: Colors.grey,
-                                ),
+                        'Login now to communicate with friends',
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                              color: Colors.grey,
+                            ),
                       ),
-                      const SizedBox(
-                        height: 30.0,
-                      ),
+                      const SizedBox(height: 30.0),
                       defaultFormField(
                         controller: emailController,
                         type: TextInputType.emailAddress,
@@ -76,15 +75,12 @@ class SocialLoginScreen extends StatelessWidget {
                           if (value == null || value.isEmpty) {
                             return 'Please enter an email address';
                           }
-                          // Add additional validation rules if needed
-                          return null; // Return null if validation passes
+                          return null;
                         },
                         label: 'Email Address',
                         prefix: Icons.email_outlined,
                       ),
-                      const SizedBox(
-                        height: 15.0,
-                      ),
+                      const SizedBox(height: 15.0),
                       defaultFormField(
                         controller: passwordController,
                         type: TextInputType.visiblePassword,
@@ -93,8 +89,7 @@ class SocialLoginScreen extends StatelessWidget {
                           if (formKey.currentState!.validate()) {
                             SocialLoginCubit.get(context).userLogin(
                                 email: emailController.text,
-                                password: passwordController.text
-                            );
+                                password: passwordController.text);
                           }
                         },
                         isPassword: SocialLoginCubit.get(context).isPassword,
@@ -106,15 +101,12 @@ class SocialLoginScreen extends StatelessWidget {
                           if (value == null || value.isEmpty) {
                             return 'Password is too short';
                           }
-                          // Add additional validation logic if needed
-                          return null; // Return null if validation passes
+                          return null;
                         },
                         label: 'Password',
                         prefix: Icons.lock_outline,
                       ),
-                      const SizedBox(
-                        height: 30.0,
-                      ),
+                      const SizedBox(height: 30.0),
                       ConditionalBuilder(
                         condition: state is! SocialLoginLoadingState,
                         builder: (context) => defaultButton(
@@ -122,31 +114,28 @@ class SocialLoginScreen extends StatelessWidget {
                             if (formKey.currentState!.validate()) {
                               SocialLoginCubit.get(context).userLogin(
                                   email: emailController.text,
-                                  password: passwordController.text
-                              );
+                                  password: passwordController.text);
                             }
                           },
-                          text: 'login',
+                          text: 'Login',
                           isUpperCase: true,
                         ),
                         fallback: (context) =>
                             const Center(child: CircularProgressIndicator()),
                       ),
-                      const SizedBox(
-                        height: 15.0,
-                      ),
+                      const SizedBox(height: 15.0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text('Don\'t have an Account ?'),
-                          defaultButton(
-                            function: () {
-                              navigateTo(
-                                context,
-                                SocialRegisterScreen(),
-                              );
+                          const Text('Don\'t have an account?'),
+                          TextButton(
+                            onPressed: () {
+                              navigateTo(context, SocialRegisterScreen());
                             },
-                            text: 'register',
+                            child: const Text(
+                              'Register',
+                              style: TextStyle(color: Colors.blue),
+                            ),
                           ),
                         ],
                       ),

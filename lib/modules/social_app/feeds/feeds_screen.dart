@@ -1,69 +1,49 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social/layout/social_app/cubit/cubit.dart';
-import 'package:social/layout/social_app/cubit/states.dart';
-import 'package:social/shared/styles/colors.dart';
+
 import 'package:social/shared/styles/icon_broken.dart';
-
 import '../../../models/social_app/post_model.dart';
+import '../new_post/cubit/posts_cubit.dart';
+import '../new_post/cubit/posts_state.dart';
 
-class FeedsScreen extends StatelessWidget {
-
+class FeedsScreen extends StatefulWidget {
   const FeedsScreen({super.key});
+
+  @override
+  State<FeedsScreen> createState() => _FeedsScreenState();
+}
+
+class _FeedsScreenState extends State<FeedsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    PostCubit.get(context).getPosts(); // Fetch posts when the screen is initialized
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<SocialCubit,SocialStates>(
-      listener: (context,state){},
-      builder: (context,state)
-      {
+    return BlocConsumer<PostCubit, PostState>(
+      listener: (context, state) {},
+      builder: (context, state) {
+        var cubit = PostCubit.get(context);
+
         return ConditionalBuilder(
-          condition: SocialCubit.get(context).posts.isNotEmpty && SocialCubit.get(context).userModel != null ,
+          condition: cubit.posts.isNotEmpty,
           builder: (context) => SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Column(
               children: [
-                Card(
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  elevation: 5.0,
-                  margin: const EdgeInsets.all(
-                    8.0,
-                  ),
-                  child: Stack(
-                    alignment: AlignmentDirectional.bottomEnd,
-                    children: [
-                      const Image(
-                        image: NetworkImage(
-                          'https://img.freepik.com/free-photo/happy-young-caucasian-female-wearing-blue-long-sleeved-shirt-making-thumb-up-sign_176420-15015.jpg?w=996&t=st=1665531631~exp=1665532231~hmac=5001e18427e37fc7c9e438a348fc4156cf962878e50e6d7bbf8a0007f340a6fd',
-                        ),
-                        fit: BoxFit.cover,
-                        height: 200.0,
-                        width: double.infinity,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          'communicate with friends',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                _buildHeaderCard(context),
                 ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) => buildPostItem(SocialCubit.get(context).posts[index],context, index),
-                  separatorBuilder: (context,index) => const SizedBox(
-                    height: 8.0,
-                  ),
-                  itemCount: SocialCubit.get(context).posts.length,
+                  itemBuilder: (context, index) =>
+                      buildPostItem(cubit.posts[index], context, index),
+                  separatorBuilder: (context, index) => const SizedBox(height: 8.0),
+                  itemCount: cubit.posts.length,
                 ),
-                const SizedBox(
-                  height: 8.0,
-                ),
+                const SizedBox(height: 8.0),
               ],
             ),
           ),
@@ -73,350 +53,170 @@ class FeedsScreen extends StatelessWidget {
     );
   }
 
-  Widget buildPostItem(PostModel model, context, index) {
-    var cubit = SocialCubit.get(context);
+  Widget _buildHeaderCard(BuildContext context) {
     return Card(
       clipBehavior: Clip.antiAliasWithSaveLayer,
       elevation: 5.0,
-      margin: const EdgeInsets.symmetric(
-        horizontal: 8.0,
+      margin: const EdgeInsets.all(8.0),
+      child: Stack(
+        alignment: AlignmentDirectional.bottomEnd,
+        children: [
+          const Image(
+            image: NetworkImage(
+              'https://img.freepik.com/free-photo/happy-young-caucasian-female-wearing-blue-long-sleeved-shirt-making-thumb-up-sign_176420-15015.jpg',
+            ),
+            fit: BoxFit.cover,
+            height: 200.0,
+            width: double.infinity,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Communicate with friends',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Colors.white,
+                  ),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget buildPostItem(PostModel model, BuildContext context, int index) {
+    return Card(
+      clipBehavior: Clip.antiAliasWithSaveLayer,
+      elevation: 5.0,
+      margin: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 25.0,
-                  backgroundImage: NetworkImage(
-                    model.image,
-                  ),
-                ),
-                const SizedBox(
-                  width: 15.0,
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            model.name,
-                            style: const TextStyle(
-                              height: 1.4,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 5.0,
-                          ),
-                          const Icon(
-                            Icons.check_circle,
-                            color: defaultColor,
-                            size: 16.0,
-                          ),
-                        ],
-                      ),
-                      Text(
-                        model.dataTime,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  width: 15.0,
-                ),
-                //++++++++++++++++++++++++++
-                // IconButton(
-                //   icon: const Icon(
-                //     Icons.more_horiz,
-                //     size: 16.0,
-                //   ),
-                //   onPressed: () {},
-                // ),
-                //++++++++++++++++++++++++++++
-                //------------------------------
-                PopupMenuButton(
-                  icon: const Icon(
-                    Icons.more_horiz,
-                    size: 16.0,
-                  ),
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'edit',
-                      child: Text('Edit'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'delete',
-                      child: Text('Delete'),
-                    ),
-                  ],
-                  onSelected: (value) {
-                    if (value == 'edit') {
-                      _showEditPostDialog(context, cubit, model);
-                      // Handle edit action
-                    } else if (value == 'delete') {
-                      // Handle delete action
-                      cubit.deletePost(cubit.postsId[index]);
-                    }
-                  },
-                ),
-                //-------------------------------
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 15.0,
-              ),
-              child: Container(
-                width: double.infinity,
-                height: 1.0,
-                color: Colors.grey[300],
-              ),
-            ),
-            Text(
-              model.text,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                bottom: 10.0,
-                top: 5.0,
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                child: Wrap(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsetsDirectional.only(
-                        end: 6.0,
-                      ),
-                      child: SizedBox(
-                        height: 25.0,
-                        child: MaterialButton(
-                          onPressed: () {},
-                          minWidth: 1.0,
-                          padding: EdgeInsets.zero,
-                          child: Text(
-                            '#software',
-                            style:
-                            Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: defaultColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsetsDirectional.only(
-                        end: 6.0,
-                      ),
-                      child: SizedBox(
-                        height: 25.0,
-                        child: MaterialButton(
-                          onPressed: () {},
-                          minWidth: 1.0,
-                          padding: EdgeInsets.zero,
-                          child: Text(
-                            '#flutter',
-                            style:
-                            Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: defaultColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if(model.postImage != '')
+            _buildPostHeader(model, context, index),
+            const SizedBox(height: 10.0),
+            Text(model.text ?? '', style: Theme.of(context).textTheme.titleMedium),
+            if (model.postImage != null && model.postImage!.isNotEmpty)
               Padding(
-                padding: const EdgeInsetsDirectional.only(
-                  top: 15.0,
-                ),
+                padding: const EdgeInsetsDirectional.only(top: 15.0),
                 child: Container(
                   height: 140.0,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(
-                      4.0,
-                    ),
-                    image:  DecorationImage(
-                      image: NetworkImage(
-                        model.image,
-                      ),
+                    borderRadius: BorderRadius.circular(4.0),
+                    image: DecorationImage(
+                      image: NetworkImage(model.postImage ?? ''),
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
               ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 5.0,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: InkWell(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 5.0,
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              IconBroken.heart,
-                              size: 16.0,
-                              color: Colors.red,
-                            ),
-                            const SizedBox(
-                              width: 5.0,
-                            ),
-                            Text(
-                              '${SocialCubit.get(context).likes[index]}',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
-                        ),
-                      ),
-                      onTap: () {},
-                    ),
-                  ),
-                  Expanded(
-                    child: InkWell(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 5.0,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            const Icon(
-                              IconBroken.chat,
-                              size: 16.0,
-                              color: Colors.amber,
-                            ),
-                            const SizedBox(
-                              width: 5.0,
-                            ),
-                            Text(
-                              '0 comment',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
-                        ),
-                      ),
-                      onTap: () {},
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                bottom: 10.0,
-              ),
-              child: Container(
-                width: double.infinity,
-                height: 1.0,
-                color: Colors.grey[300],
-              ),
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: InkWell(
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 18.0,
-                          backgroundImage: NetworkImage(
-                            SocialCubit.get(context).userModel!.image,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 15.0,
-                        ),
-                        Text(
-                          'write a comment ...',
-                          style:
-                          Theme.of(context).textTheme.bodySmall?.copyWith(
-                            height: 1.4,
-                          ),
-                        ),
-                      ],
-                    ),
-                    onTap: () {},
-                  ),
-                ),
-                InkWell(
-                  child: Row(
-                    children: [
-                      const Icon(
-                        IconBroken.heart,
-                        size: 16.0,
-                        color: Colors.red,
-                      ),
-                      const SizedBox(
-                        width: 5.0,
-                      ),
-                      Text(
-                        'Like',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ],
-                  ),
-                  onTap: ()
-                  {
-                    cubit.toggleLikePost(cubit.postsId[index]);
-                    // SocialCubit.get(context).likePost(SocialCubit.get(context).postsId[index]);
-                  },
-                ),
-              ],
-            ),
+            _buildLikeCommentRow(context, index),
+            const Divider(),
           ],
         ),
       ),
     );
   }
-}
 
-//--------------------------------------------------------------------------
-void _showEditPostDialog(BuildContext context, SocialCubit cubit, PostModel post) {
-  var contentController = TextEditingController(text: post.text);
-
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Edit Post'),
-        content: TextField(
-          controller: contentController,
-          decoration: const InputDecoration(hintText: 'Enter new content'),
+  Widget _buildPostHeader(PostModel model, BuildContext context, int index) {
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 25.0,
+          backgroundImage: NetworkImage(model.image ?? ''),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancel'),
+        const SizedBox(width: 15.0),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(model.name, style: const TextStyle(height: 1.4)),
+              Text(model.dataTime ?? '', style: Theme.of(context).textTheme.bodySmall),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              cubit.editPost(post.uId, contentController.text);
-              Navigator.of(context).pop();
-            },
-            child: const Text('Save'),
+        ),
+        PopupMenuButton(
+          icon: const Icon(Icons.more_horiz, size: 16.0),
+          itemBuilder: (context) => [
+            const PopupMenuItem(value: 'edit', child: Text('Edit')),
+            const PopupMenuItem(value: 'delete', child: Text('Delete')),
+          ],
+          onSelected: (value) {
+            if (value == 'delete') {
+              _confirmDeletePost(context, model.postId);
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLikeCommentRow(BuildContext context, int index) {
+    var cubit = PostCubit.get(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: InkWell(
+              child: Row(
+                children: [
+                  const Icon(IconBroken.heart, size: 16.0, color: Colors.red),
+                  const SizedBox(width: 5.0),
+                  Text(
+                    'Like', // Replace with actual like count if available
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
+              onTap: () {
+                cubit.toggleLikePost(cubit.posts[index].postId);
+              },
+            ),
+          ),
+          Expanded(
+            child: InkWell(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Icon(IconBroken.chat, size: 16.0, color: Colors.amber),
+                  const SizedBox(width: 5.0),
+                  Text('0 comments', style: Theme.of(context).textTheme.bodySmall), // Placeholder for dynamic comments
+                ],
+              ),
+              onTap: () {},
+            ),
           ),
         ],
-      );
-    },
-  );
+      ),
+    );
+  }
+
+  void _confirmDeletePost(BuildContext context, String postId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Post'),
+          content: const Text('Are you sure you want to delete this post?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Delete'),
+              onPressed: () {
+                PostCubit.get(context).deletePost(postId);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

@@ -1,33 +1,39 @@
 class CommentModel {
-  late String name;
-  late String image;
-  late String text;
-  late String dateTime;
-  late String commentId;
+  String? name;
+  String? image;
+  String? text;
+  String? dateTime;
+  String? commentId;
 
+  // Constructor with optional fields
   CommentModel({
-    required this.name,
-    required this.image,
-    required this.text,
-    required this.dateTime,
-    required this.commentId,
+    this.name,
+    this.image,
+    this.text,
+    this.dateTime,
+    this.commentId,
   });
 
-  CommentModel.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
-    image = json['image'];
-    text = json['text'];
-    dateTime = json['dateTime'];
-    commentId = json['commentId'];
-  }
+  // Named constructor to create an object from JSON with null-safety checks
+ factory CommentModel.fromJson(Map<String, dynamic> json)
+      {
+        return CommentModel(
+          name: json['name'],
+          image: json['image'],
+          text: json['text'],
+          dateTime: json['dateTime'],
+          commentId: json['commentId'],
+        );
+      }
 
+  // Method to convert the object to a Map (for storing data)
   Map<String, dynamic> toMap() {
     return {
-      'name': name,
-      'image': image,
-      'text': text,
-      'dateTime': dateTime,
-      'commentId': commentId,
+      'name': name ?? '',
+      'image': image ?? '',
+      'text': text ?? '',
+      'dateTime': dateTime ?? '',
+      'commentId': commentId ?? '',
     };
   }
 }

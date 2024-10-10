@@ -7,11 +7,6 @@ import 'package:social/modules/social_app/social_register/cubit/states.dart';
 import 'package:social/shared/components/components.dart';
 
 class SocialRegisterScreen extends StatelessWidget {
-  // var formKey = GlobalKey<FormState>();
-  // var nameController = TextEditingController();
-  // var emailController = TextEditingController();
-  // var passwordController = TextEditingController();
-  // var phoneController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -20,15 +15,19 @@ class SocialRegisterScreen extends StatelessWidget {
 
   SocialRegisterScreen({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) => SocialRegisterCubit(),
-      child: BlocConsumer<SocialRegisterCubit, SocialRegisterStates>(
+      create: (BuildContext context) => RegisterCubit(),
+      child: BlocConsumer<RegisterCubit, RegisterState>(
         listener: (context, state) {
-          if (state is SocialCreateUserSuccessState) {
-            navigateAndFinish(context, const SocialLayout(),);
+          if (state is RegisterSuccessState) {
+            navigateAndFinish(
+              context,
+               LayoutScreen(userId: state.uId!,),
+            );
+          } else if (state is RegisterErrorState) {
+            showToast(text: state.error, state: ToastStates.error);
           }
         },
         builder: (context, state) {
@@ -45,95 +44,81 @@ class SocialRegisterScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Register',
-                          style:
-                              Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                    color: Colors.black,
-                                  ),
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                color: Colors.black,
+                              ),
                         ),
                         Text(
                           'Register now to communicate with friends',
-                          style:
-                              Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: Colors.grey,
-                                  ),
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: Colors.grey,
+                              ),
                         ),
-                        const SizedBox(
-                          height: 30.0,
-                        ),
+                        const SizedBox(height: 30.0),
                         defaultFormField(
                           controller: nameController,
                           type: TextInputType.name,
                           validate: (String? value) {
                             if (value == null || value.isEmpty) {
-                              return 'please enter user name';
+                              return 'Please enter your name';
                             }
                             return null;
                           },
                           label: 'User Name',
                           prefix: Icons.person,
                         ),
-                        const SizedBox(
-                          height: 30.0,
-                        ),
+                        const SizedBox(height: 30.0),
                         defaultFormField(
                           controller: emailController,
                           type: TextInputType.emailAddress,
                           validate: (String? value) {
                             if (value == null || value.isEmpty) {
-                              return 'please enter a valid email address';
+                              return 'Please enter your email address';
                             }
                             return null;
                           },
-                          label: 'Email',
+                          label: 'Email Address',
                           prefix: Icons.email,
                         ),
-                        const SizedBox(
-                          height: 15.0,
-                        ),
+                        const SizedBox(height: 15.0),
                         defaultFormField(
                           controller: passwordController,
                           type: TextInputType.visiblePassword,
-                          suffix: SocialRegisterCubit.get(context).suffix,
+                          suffix: RegisterCubit.get(context).suffix,
                           onSubmit: (value) {},
-                          isPassword:
-                              SocialRegisterCubit.get(context).isPassword,
+                          isPassword: RegisterCubit.get(context).isPassword,
                           suffixPressed: () {
-                            SocialRegisterCubit.get(context)
-                                .changePasswordVisibility();
+                            RegisterCubit.get(context).changePasswordVisibility();
                           },
                           validate: (String? value) {
                             if (value == null || value.isEmpty) {
-                              return 'password is too short';
+                              return 'Password is too short';
                             }
                             return null;
                           },
                           label: 'Password',
                           prefix: Icons.lock_outline,
                         ),
-                        const SizedBox(
-                          height: 30.0,
-                        ),
+                        const SizedBox(height: 30.0),
                         defaultFormField(
                           controller: phoneController,
                           type: TextInputType.phone,
                           validate: (String? value) {
                             if (value == null || value.isEmpty) {
-                              return 'please enter a phone number';
+                              return 'Please enter your phone number';
                             }
                             return null;
                           },
                           label: 'Phone',
                           prefix: Icons.phone,
                         ),
-                        const SizedBox(
-                          height: 30.0,
-                        ),
+                        const SizedBox(height: 30.0),
                         ConditionalBuilder(
-                          condition: state is! SocialRegisterLoadingState,
+                          condition: state is! RegisterLoadingState,
                           builder: (context) => defaultButton(
                             function: () {
                               if (formKey.currentState!.validate()) {
-                                SocialRegisterCubit.get(context).userRegister(
+                                RegisterCubit.get(context).userRegister(
                                   name: nameController.text,
                                   email: emailController.text,
                                   password: passwordController.text,
@@ -141,7 +126,7 @@ class SocialRegisterScreen extends StatelessWidget {
                                 );
                               }
                             },
-                            text: 'register',
+                            text: 'Register',
                             isUpperCase: true,
                           ),
                           fallback: (context) =>
