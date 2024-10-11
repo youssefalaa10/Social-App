@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:social/modules/settings/cubit/profile_cubit.dart';
 import 'package:social/shared/components/components.dart';
 import 'package:social/shared/styles/icon_broken.dart';
@@ -9,7 +10,7 @@ import 'cubit/posts_state.dart';
 class NewPostScreen extends StatefulWidget {
   final String userId;
 
-  NewPostScreen({super.key, required this.userId});
+  const NewPostScreen({super.key, required this.userId});
 
   @override
   State<NewPostScreen> createState() => _NewPostScreenState();
@@ -17,26 +18,54 @@ class NewPostScreen extends StatefulWidget {
 
 class _NewPostScreenState extends State<NewPostScreen> {
   final TextEditingController textController = TextEditingController();
+  bool isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // Fetch the user data when the screen initializes
+    ProfileCubit.get(context).getUserData(widget.userId);
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<PostCubit, PostState>(
       listener: (context, state) {
         if (state is PostSuccessState) {
+          // Stop loading and pop back to the previous screen (FeedScreen)
+          setState(() {
+            isLoading = false;
+          });
+         
+
+          // Show success snackbar after popping back
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Post Created Successfully!')),
+            const SnackBar(
+              content: Text('Post Created Successfully!'),
+              backgroundColor: Colors.green,
+            ),
           );
-          Navigator.pop(context);
         } else if (state is PostErrorState) {
+          // Stop loading and show error snackbar
+          setState(() {
+            isLoading = false;
+          });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.error)),
           );
+        } else if (state is PostLoadingState) {
+          // Set loading to true when the post is being created
+          setState(() {
+            isLoading = true;
+          });
         }
       },
       builder: (context, state) {
-        var cubit = ProfileCubit.get(context).userModel;
-    
+        var profileCubit = ProfileCubit.get(context).userModel;
+
+        if (profileCubit == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
         return Scaffold(
           appBar: AppBar(
@@ -54,26 +83,21 @@ class _NewPostScreenState extends State<NewPostScreen> {
 
                   final now = DateTime.now();
 
-                  if (cubit!.image.isEmpty) {
+                  if (PostCubit.get(context).postImage == null) {
                     PostCubit.get(context).createPost(
                       dateTime: now.toString(),
                       text: textController.text,
-                      name: cubit.name,
-                      uId: cubit.uId,
-                      image: cubit.image,
-                    ).then(
-                      (value) {
-                        Navigator.pop(context);
-                      },
+                      name: profileCubit.name,
+                      uId: profileCubit.uId,
+                      image: profileCubit.image,
                     );
-                  
                   } else {
                     PostCubit.get(context).uploadPostImage(
                       dateTime: now.toString(),
                       text: textController.text,
-                      name: cubit.name,
-                      uId: cubit.uId,
-                      image: cubit.image,
+                      name: profileCubit.name,
+                      uId: profileCubit.uId,
+                      image: profileCubit.image,
                     );
                   }
                 },
@@ -85,17 +109,17 @@ class _NewPostScreenState extends State<NewPostScreen> {
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: [
-                if (state is PostLoadingState) const LinearProgressIndicator(),
+                if (isLoading) const LinearProgressIndicator(),
                 Row(
                   children: [
                     CircleAvatar(
-                        radius: 25.0,
-                        // backgroundImage: AssetImage('assets/images/profile.jpeg')),
-                        backgroundImage: NetworkImage(cubit!.image)),
+                      radius: 25.0,
+                      backgroundImage: NetworkImage(profileCubit.image),
+                    ),
                     const SizedBox(width: 15.0),
                     Expanded(
                       child: Text(
-                        cubit.name,
+                        profileCubit.name,
                         style: const TextStyle(height: 1.4),
                       ),
                     ),
@@ -111,7 +135,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                   ),
                 ),
                 const SizedBox(height: 20.0),
-                if (cubit.image == '')
+                if (PostCubit.get(context).postImage != null)
                   Stack(
                     alignment: AlignmentDirectional.topEnd,
                     children: [
@@ -121,7 +145,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(4.0),
                           image: DecorationImage(
-                            // image: AssetImage('assets/images/profile.jpeg'),
                             image: FileImage(PostCubit.get(context).postImage!),
                             fit: BoxFit.cover,
                           ),
