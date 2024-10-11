@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social/shared/styles/icon_broken.dart';
-
-import 'package:get_it/get_it.dart';
-
+import '../../shared/styles/icon_broken.dart';
 import '../chats/chats_screen.dart';
-import '../chats/cubit/messages_cubit.dart';
 import '../feeds/feeds_screen.dart';
-import '../new_post/cubit/posts_cubit.dart';
 import '../new_post/new_post_screen.dart';
-import '../settings/cubit/profile_cubit.dart';
 import '../settings/settings_screen.dart';
 import '../users/users_screen.dart';
-
-
-final getIt = GetIt.instance;
+import '../new_post/cubit/posts_cubit.dart';
+import '../chats/cubit/messages_cubit.dart';
+import '../settings/cubit/profile_cubit.dart';
 
 class LayoutCubit extends Cubit<int> {
   final String userId;
@@ -25,23 +19,23 @@ class LayoutCubit extends Cubit<int> {
 
   int currentIndex = 0;
 
-  List<Widget> get screens => [
-        // Using GetIt to provide cubits
+  // Modified screens method to use context from the widget tree
+  List<Widget> getScreens(BuildContext context) => [
         BlocProvider.value(
-          value: getIt<PostCubit>()..getPosts(),
+          value: BlocProvider.of<PostCubit>(context),
           child: const FeedsScreen(),
         ),
         BlocProvider.value(
-          value: getIt<MessageCubit>(),
+          value: BlocProvider.of<MessageCubit>(context),
           child: const ChatsScreen(),
         ),
         BlocProvider.value(
-          value: getIt<PostCubit>(),
+          value: BlocProvider.of<PostCubit>(context),
           child: NewPostScreen(userId: userId),
         ),
         const UsersScreen(),
         BlocProvider.value(
-          value: getIt<ProfileCubit>()..getUserData(userId),
+          value: BlocProvider.of<ProfileCubit>(context),
           child: const SettingsScreen(),
         ),
       ];
@@ -79,22 +73,8 @@ class LayoutScreen extends StatelessWidget {
                 ? null // No AppBar for Create Post screen
                 : AppBar(
                     title: Text(cubit.titles[cubit.currentIndex]),
-                    actions: [
-                      IconButton(
-                        icon: const Icon(IconBroken.notification),
-                        onPressed: () {
-                          // Add actions for notifications
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(IconBroken.search),
-                        onPressed: () {
-                          // Add actions for search
-                        },
-                      ),
-                    ],
                   ),
-            body: cubit.screens[cubit.currentIndex],
+            body: cubit.getScreens(context)[cubit.currentIndex], // Use getScreens method to pass context
             bottomNavigationBar: BottomNavigationBar(
               currentIndex: cubit.currentIndex,
               onTap: (index) {

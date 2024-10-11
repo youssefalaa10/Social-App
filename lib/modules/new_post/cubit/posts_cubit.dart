@@ -14,24 +14,15 @@ class PostCubit extends Cubit<PostState> {
   static PostCubit get(context) => BlocProvider.of(context);
 
   List<PostModel> posts = [];
-  SocialUserModel? userModel; // Add userModel to store the current user's data
+  SocialUserModel? userModel =SocialUserModel(name: 'sss', email: 'email', phone: 'phone', uId: 'uId', image: 'assets/images/profile.jpeg', cover: 'assets/images/profile.jpeg') ;
   File? postImage;
   final picker = ImagePicker();
 
-  // Fetch user data from Firestore based on userId
-  void getUserData(String uId) {
-    emit(PostLoadingState());
 
-    FirebaseFirestore.instance.collection('users').doc(uId).get().then((value) {
-      userModel = SocialUserModel.fromJson(value.data()!); // Initialize userModel
-      emit(PostSuccessState());
-    }).catchError((error) {
-      emit(PostErrorState(error.toString()));
-    });
-  }
+
 
   // Fetch all posts from Firestore
-  void getPosts() {
+  Future<void> getPosts() async {
     emit(PostLoadingState());
 
     FirebaseFirestore.instance.collection('posts').get().then((value) {
@@ -46,14 +37,14 @@ class PostCubit extends Cubit<PostState> {
   }
 
   // Create a new post
-  void createPost({
+  Future<void> createPost({
     required String text,
     required String dateTime,
     String? postImageUrl,
     required String name,
     required String uId,
     required String image,
-  }) {
+  }) async {
     PostModel postModel = PostModel(
       postId: '', // Firestore will generate the ID, so we pass an empty string initially
       name: name,
@@ -73,13 +64,18 @@ class PostCubit extends Cubit<PostState> {
   }
 
   // Upload post image to Firebase Storage
-  void uploadPostImage({
+  Future<void> uploadPostImage({
     required String text,
     required String dateTime,
     required String name,
     required String uId,
     required String image,
-  }) {
+  }) async {
+    if (postImage == null) {
+      emit(PostImagePickedErrorState('No image selected'));
+      return;
+    }
+
     emit(PostLoadingState());
 
     FirebaseStorage.instance
@@ -121,14 +117,38 @@ class PostCubit extends Cubit<PostState> {
     emit(PostImageRemovedState());
   }
 
-  // Toggle like post (needs Firestore integration)
-  void toggleLikePost(String postId) {
-    // Implement Firestore like logic
-    emit(PostLikedState());
+  // Toggle like post (Firestore integration)
+  Future<void> toggleLikePost(String postId) async {
+    try {
+      DocumentReference postRef = FirebaseFirestore.instance.collection('posts').doc(postId);
+
+      // Perform a transaction to avoid concurrency issues with likes
+      FirebaseFirestore.instance.runTransaction((transaction) async {
+        DocumentSnapshot postSnapshot = await transaction.get(postRef);
+
+        if (!postSnapshot.exists) {
+          emit(PostErrorState('Post does not exist'));
+          return;
+        }
+
+        List<dynamic> likes = postSnapshot['likes'] ?? [];
+        String currentUserId = userModel!.uId;
+
+        if (likes.contains(currentUserId)) {
+          transaction.update(postRef, {'likes': FieldValue.arrayRemove([currentUserId])});
+        } else {
+          transaction.update(postRef, {'likes': FieldValue.arrayUnion([currentUserId])});
+        }
+      });
+
+      emit(PostLikedState());
+    } catch (error) {
+      emit(PostErrorState(error.toString()));
+    }
   }
 
   // Delete a post with confirmation
-  void deletePost(String postId) {
+  Future<void> deletePost(String postId) async {
     FirebaseFirestore.instance.collection('posts').doc(postId).delete().then((value) {
       emit(PostDeleteSuccessState());
       getPosts(); // Refresh posts after deletion

@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 
 import 'package:social/shared/styles/icon_broken.dart';
 
@@ -11,21 +10,11 @@ import 'cubit/profile_cubit.dart';
 import 'cubit/profile_state.dart';
 import 'edit_profile_screen.dart';
 
-final getIt = GetIt.instance;
-
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var cubit = getIt<ProfileCubit>();
-
-    // Ensure to load user data here if not loaded already
-    if (cubit.userModel == null) {
-      cubit.getUserData(
-          FirebaseAuth.instance.currentUser!.uid); // Use current user's ID
-    }
-
     return BlocConsumer<ProfileCubit, ProfileState>(
       listener: (context, state) {
         if (state is ProfileErrorState) {
@@ -33,7 +22,13 @@ class SettingsScreen extends StatelessWidget {
         }
       },
       builder: (context, state) {
+        var cubit = ProfileCubit.get(context); // Access cubit through BlocProvider
         var userModel = cubit.userModel;
+
+        // Ensure to load user data here if not loaded already
+        if (userModel == null) {
+          cubit.getUserData(FirebaseAuth.instance.currentUser!.uid); // Use current user's ID
+        }
 
         return userModel != null
             ? Padding(
@@ -127,8 +122,7 @@ class SettingsScreen extends StatelessWidget {
         Expanded(
           child: OutlinedButton(
             onPressed: () {
-              cubit
-                  .getProfileImage(); // Trigger the method to pick profile image
+              cubit.getProfileImage(); // Trigger the method to pick profile image
             },
             child: const Text('Change Profile Image'),
           ),
@@ -150,7 +144,7 @@ class SettingsScreen extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => BlocProvider.value(
-                  value: getIt<ProfileCubit>(), // Use the cubit from GetIt
+                  value: cubit, // Pass the cubit via BlocProvider
                   child: EditProfileScreen(),
                 ),
               ),

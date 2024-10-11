@@ -1,22 +1,21 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:social/shared/bloc_observer.dart';
 import 'package:social/shared/network/local/cache_helper.dart';
 import 'package:social/shared/styles/themes.dart';
 
 import 'modules/Auth/login/login_screen.dart';
+import 'modules/chats/cubit/messages_cubit.dart';
 import 'modules/layout/layout_screen.dart';
-
-import 'shared/DI/service_locator.dart';
+import 'modules/new_post/cubit/posts_cubit.dart';
+import 'modules/settings/cubit/profile_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await CacheHelper.init();
-
-  // Initialize GetIt
-  setupGetIt(); // Call the setup function to register dependencies
 
   Bloc.observer = MyBlocObserver();
 
@@ -24,6 +23,7 @@ void main() async {
 
   Widget startWidget;
   if (uId != null) {
+    
     startWidget = LayoutScreen(userId: uId); // Pass the userId to LayoutScreen
   } else {
     startWidget = LoginScreen();
@@ -39,12 +39,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: ThemeMode.light,
-      home: startWidget,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => PostCubit()..getPosts()),
+        BlocProvider(create: (context) => MessageCubit()..getUsers()),
+        BlocProvider(
+            create: (context) =>
+                ProfileCubit()..getUserData(CacheHelper.getData(key: 'uId'))),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: lightTheme,
+        darkTheme: darkTheme,
+        themeMode: ThemeMode.light,
+        home: startWidget,
+      ),
     );
   }
 }

@@ -4,8 +4,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-
 import '../../../models/user_model.dart';
+import '../../../shared/network/local/cache_helper.dart';
 import 'profile_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
@@ -19,11 +19,14 @@ class ProfileCubit extends Cubit<ProfileState> {
   final ImagePicker picker = ImagePicker();
 
   // Fetch user data
+
   void getUserData(String uId) {
     emit(ProfileLoadingState());
-
     FirebaseFirestore.instance.collection('users').doc(uId).get().then((value) {
       userModel = SocialUserModel.fromJson(value.data()!);
+      CacheHelper.saveData(
+          key: 'uId', value: uId); // Save the user data locally
+      print('settttttttting:${userModel!.name}');
       emit(ProfileSuccessState());
     }).catchError((error) {
       emit(ProfileErrorState(error.toString()));
@@ -68,8 +71,14 @@ class ProfileCubit extends Cubit<ProfileState> {
     required String uId,
   }) async {
     if (profileImage != null) {
-      String profileImageUrl = await _uploadImage(profileImage!, 'users/profile');
-      updateUser(uId: uId, name: name, phone: phone, bio: bio, profileImage: profileImageUrl);
+      String profileImageUrl =
+          await _uploadImage(profileImage!, 'users/profile');
+      updateUser(
+          uId: uId,
+          name: name,
+          phone: phone,
+          bio: bio,
+          profileImage: profileImageUrl);
     }
   }
 
@@ -82,7 +91,12 @@ class ProfileCubit extends Cubit<ProfileState> {
   }) async {
     if (coverImage != null) {
       String coverImageUrl = await _uploadImage(coverImage!, 'users/cover');
-      updateUser(uId: uId, name: name, phone: phone, bio: bio, coverImage: coverImageUrl);
+      updateUser(
+          uId: uId,
+          name: name,
+          phone: phone,
+          bio: bio,
+          coverImage: coverImageUrl);
     }
   }
 

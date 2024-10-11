@@ -1,8 +1,6 @@
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
-
 import 'package:social/shared/components/components.dart';
 
 import '../../models/user_model.dart';
@@ -10,14 +8,12 @@ import 'chat_details_screen.dart';
 import 'cubit/messages_cubit.dart';
 import 'cubit/messages_state.dart';
 
-final getIt = GetIt.instance;
-
 class ChatsScreen extends StatelessWidget {
   const ChatsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var cubit = getIt<MessageCubit>(); // Retrieve MessageCubit from get_it
+    var cubit = BlocProvider.of<MessageCubit>(context); // Use BlocProvider to get the cubit
 
     return BlocConsumer<MessageCubit, MessageState>(
       listener: (context, state) {
@@ -33,7 +29,6 @@ class ChatsScreen extends StatelessWidget {
         }
 
         return Scaffold(
-         
           body: ConditionalBuilder(
             condition: cubit.users.isNotEmpty || state is! MessageLoadingState,
             builder: (context) => ListView.separated(
@@ -58,12 +53,11 @@ class ChatsScreen extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => BlocProvider.value(
-                value: getIt<MessageCubit>(),
+                value: BlocProvider.of<MessageCubit>(context), // Use BlocProvider
                 child: ChatDetailsScreen(userModel: model),
               ),
             ),
           );
-     
         },
         child: Padding(
           padding: const EdgeInsets.all(20.0),

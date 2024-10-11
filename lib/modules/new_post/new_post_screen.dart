@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social/modules/settings/cubit/profile_cubit.dart';
 import 'package:social/shared/components/components.dart';
 import 'package:social/shared/styles/icon_broken.dart';
 import 'cubit/posts_cubit.dart';
 import 'cubit/posts_state.dart';
 
-class NewPostScreen extends StatelessWidget {
-  final TextEditingController textController = TextEditingController();
+class NewPostScreen extends StatefulWidget {
   final String userId;
 
   NewPostScreen({super.key, required this.userId});
+
+  @override
+  State<NewPostScreen> createState() => _NewPostScreenState();
+}
+
+class _NewPostScreenState extends State<NewPostScreen> {
+  final TextEditingController textController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +35,8 @@ class NewPostScreen extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        var cubit = PostCubit.get(context);
+        var cubit = ProfileCubit.get(context).userModel;
+    
 
         return Scaffold(
           appBar: AppBar(
@@ -37,26 +46,34 @@ class NewPostScreen extends StatelessWidget {
                 function: () {
                   if (textController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Post content cannot be empty')),
+                      const SnackBar(
+                          content: Text('Post content cannot be empty')),
                     );
                     return;
                   }
+
                   final now = DateTime.now();
-                  if (cubit.postImage == null) {
-                    cubit.createPost(
+
+                  if (cubit!.image.isEmpty) {
+                    PostCubit.get(context).createPost(
                       dateTime: now.toString(),
                       text: textController.text,
-                      name: cubit.userModel!.name,
-                      uId: cubit.userModel!.uId,
-                      image: cubit.userModel!.image,
+                      name: cubit.name,
+                      uId: cubit.uId,
+                      image: cubit.image,
+                    ).then(
+                      (value) {
+                        Navigator.pop(context);
+                      },
                     );
+                  
                   } else {
-                    cubit.uploadPostImage(
+                    PostCubit.get(context).uploadPostImage(
                       dateTime: now.toString(),
                       text: textController.text,
-                      name: cubit.userModel!.name,
-                      uId: cubit.userModel!.uId,
-                      image: cubit.userModel!.image,
+                      name: cubit.name,
+                      uId: cubit.uId,
+                      image: cubit.image,
                     );
                   }
                 },
@@ -71,16 +88,14 @@ class NewPostScreen extends StatelessWidget {
                 if (state is PostLoadingState) const LinearProgressIndicator(),
                 Row(
                   children: [
-                  CircleAvatar(
-                      radius: 25.0,
-                      backgroundImage: NetworkImage(
-                        'https://img.freepik.com/free-photo/pretty-smiling-joyfully-female-with-fair-hair-dressed-casually-looking-with-satisfaction_176420-15187.jpg?w=996&t=st=1665531661~exp=1665532261~hmac=11fd387eee878ce97f048ca33c4d86f1a5c0c29f5092933c0632cf80a8d85d12',
-                      ),
-                    ),
+                    CircleAvatar(
+                        radius: 25.0,
+                        // backgroundImage: AssetImage('assets/images/profile.jpeg')),
+                        backgroundImage: NetworkImage(cubit!.image)),
                     const SizedBox(width: 15.0),
                     Expanded(
                       child: Text(
-                        cubit.userModel!.name,
+                        cubit.name,
                         style: const TextStyle(height: 1.4),
                       ),
                     ),
@@ -96,7 +111,7 @@ class NewPostScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20.0),
-                if (cubit.postImage != null)
+                if (cubit.image == '')
                   Stack(
                     alignment: AlignmentDirectional.topEnd,
                     children: [
@@ -106,7 +121,8 @@ class NewPostScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(4.0),
                           image: DecorationImage(
-                            image: FileImage(cubit.postImage!),
+                            // image: AssetImage('assets/images/profile.jpeg'),
+                            image: FileImage(PostCubit.get(context).postImage!),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -117,7 +133,7 @@ class NewPostScreen extends StatelessWidget {
                           child: Icon(Icons.close, size: 16.0),
                         ),
                         onPressed: () {
-                          cubit.removePostImage();
+                          PostCubit.get(context).removePostImage();
                         },
                       ),
                     ],
@@ -127,7 +143,7 @@ class NewPostScreen extends StatelessWidget {
                     Expanded(
                       child: TextButton(
                         onPressed: () {
-                          cubit.getPostImage();
+                          PostCubit.get(context).getPostImage();
                         },
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -141,7 +157,9 @@ class NewPostScreen extends StatelessWidget {
                     ),
                     Expanded(
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // Tags logic here
+                        },
                         child: const Text('# Tags'),
                       ),
                     ),

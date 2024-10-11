@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
+
 
 
 
@@ -8,7 +8,7 @@ import '../../models/comment_model.dart';
 import 'cubit/comments_cubit.dart';
 import 'cubit/comments_state.dart';
 
-final getIt = GetIt.instance;
+
 class CommentScreen extends StatelessWidget {
   final String postId;
   final TextEditingController commentController = TextEditingController();
@@ -18,7 +18,7 @@ class CommentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) => CommentCubit()..loadComments(postId), // Initialize CommentCubit and load comments
+      create: (BuildContext context) => CommentCubit()..loadComments(postId),
       child: BlocConsumer<CommentCubit, CommentState>(
         listener: (context, state) {
           if (state is CommentSuccessState) {
@@ -29,8 +29,8 @@ class CommentScreen extends StatelessWidget {
           }
         },
         builder: (context, state) {
-          var cubit = getIt<CommentCubit>(); 
-          var comments = cubit.comments; // Assuming comments are fetched and stored in cubit
+          var cubit = CommentCubit(); 
+          var comments = cubit.comments;
 
           return Scaffold(
             appBar: AppBar(
